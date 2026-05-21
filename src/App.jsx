@@ -52,14 +52,23 @@ const PAGE_ICONS = {
   Contact: "bi-envelope",
 };
 
-function Sidebar({ current, onNav }) {
+function Sidebar({ current, onNav, isMobile, open, onClose }) {
   return (
     <div style={{
       width: 300, minHeight: "100vh", background: T.sidebar,
       display: "flex", flexDirection: "column", flexShrink: 0,
-      position: "relative", zIndex: 10,
-      borderRight: `1px solid ${T.sidebarBdr}`
+      position: isMobile ? "fixed" : "relative",
+      top: 0, left: 0, zIndex: 20,
+      transform: isMobile ? `translateX(${open ? 0 : -100}%)` : "none",
+      transition: isMobile ? "transform 0.25s ease" : "none",
+      borderRight: `1px solid ${T.sidebarBdr}`,
+      boxShadow: isMobile ? "0 24px 60px rgba(0,0,0,0.18)" : "none"
     }}>
+      {isMobile && (
+        <div style={{ display: "flex", justifyContent: "flex-end", padding: "14px 18px" }}>
+          <button onClick={onClose} style={{ border: "none", background: "transparent", color: "#fff", fontSize: "1.2rem", cursor: "pointer" }}>✕</button>
+        </div>
+      )}
       <div style={{ padding: "30px 20px 20px", textAlign: "center", borderBottom: `1px solid ${T.sidebarBdr}` }}>
         <div style={{ width: 120, height: 120, borderRadius: "50%", overflow: "hidden", margin: "0 auto 15px", border: `4px solid rgba(255,255,255,0.1)` }}>
           <img
@@ -107,7 +116,7 @@ function Sidebar({ current, onNav }) {
               key={p}
               onClick={() => onNav(p)}
               style={{
-                width: "100%", background: "none", border: "none", cursor: "pointer",
+                width: "100%", border: "none", cursor: "pointer",
                 display: "flex", alignItems: "center", gap: 10,
                 padding: "12px 25px",
                 color: active ? "#fff" : "rgba(255,255,255,0.65)",
@@ -136,11 +145,12 @@ function Sidebar({ current, onNav }) {
   );
 }
 
-function Page({ children, bg = T.bodyBg }) {
+function Page({ children, bg = T.bodyBg, isMobile }) {
   return (
     <div className="page-slide" style={{
       flex: 1, overflowY: "auto", background: bg,
-      fontFamily: "'Open Sans', sans-serif"
+      fontFamily: "'Open Sans', sans-serif",
+      WebkitOverflowScrolling: "touch"
     }}>
       {children}
     </div>
@@ -174,7 +184,7 @@ function SecHeader({ title, sub, center = true }) {
 
 const TYPED_STRINGS = ["Hardware Engineer", "HCI Researcher", "FPGA Builder", "MIT EECS Graduate", "Maker & Inventor"];
 
-function PageHome({ onNav }) {
+function PageHome({ onNav, isMobile }) {
   const [idx, setIdx] = useState(0);
   const [displayed, setDisplayed] = useState("");
   const [typing, setTyping] = useState(true);
@@ -202,10 +212,10 @@ function PageHome({ onNav }) {
   }, [typing, charIdx, idx]);
 
   return (
-    <Page bg={T.sidebar}>
+    <Page bg={T.sidebar} isMobile={isMobile}>
       <div style={{
         minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
-        textAlign: "center", padding: "60px 40px",
+        textAlign: "center", padding: isMobile ? "40px 18px" : "60px 40px",
         background: `linear-gradient(rgba(4,11,20,0.85), rgba(4,11,20,0.85)), url('https://ahmadtak-3212.github.io/assets/img/hero-bg.jpg') center/cover no-repeat`
       }}>
         <div className="fade-in">
@@ -293,13 +303,13 @@ function SkillBar({ label, pct }) {
   );
 }
 
-function PageAbout() {
+function PageAbout({ isMobile }) {
   return (
-    <Page>
-      <div style={{ padding: "60px 48px 40px" }}>
+    <Page isMobile={isMobile}>
+      <div style={{ padding: isMobile ? "40px 18px 30px" : "60px 48px 40px" }}>
         <SecHeader title="About" sub="Learn more about my background, skills, and what drives me as an engineer and researcher." />
 
-        <div style={{ display: "grid", gridTemplateColumns: "300px 1fr", gap: 48, marginBottom: 60 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "300px 1fr", gap: isMobile ? 30 : 48, marginBottom: 60 }}>
           <div>
             <img
               src="https://ahmadtak-3212.github.io/assets/img/taka_profile_1.jpg"
@@ -328,11 +338,11 @@ function PageAbout() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 48px", marginBottom: 60 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: isMobile ? 20 : "0 48px", marginBottom: 60 }}>
           {SKILL_BARS.map(s => <SkillBar key={s.label} {...s} />)}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 24, marginBottom: 48 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(4, 1fr)", gap: 24, marginBottom: 48 }}>
           {[ ["10+","Programming\nLanguages"],["20+","Projects\nCompleted"],["3+","Years\nExperience"],["3","Research\nPapers"] ].map(([n, l]) => (
             <div key={l} style={{ background: "#fff", borderRadius: 8, padding: "28px 20px", textAlign: "center", boxShadow: "0 2px 12px rgba(0,0,0,0.06)", border: "1px solid #eef1f5" }}>
               <div style={{ fontFamily: "'Raleway',sans-serif", fontSize: "2.2rem", fontWeight: 700, color: T.accent }}>{n}</div>
@@ -392,13 +402,13 @@ function TlItem({ item }) {
   );
 }
 
-function PageResume() {
+function PageResume({ isMobile }) {
   return (
-    <Page>
-      <div style={{ padding: "60px 48px 40px" }}>
+    <Page isMobile={isMobile}>
+      <div style={{ padding: isMobile ? "40px 18px 30px" : "60px 48px 40px" }}>
         <SecHeader title="Resume" sub="Innovative and deadline-driven researcher with 3+ years of experience designing and developing digital systems from initial concept to final polished deliverable." />
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 48 }}>
           <div>
             <h3 style={{ fontFamily: "'Raleway',sans-serif", fontSize: "1.1rem", fontWeight: 700, color: T.heading, marginBottom: 24, display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ width: 28, height: 28, borderRadius: "50%", background: T.accent, display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.75rem", color: "#fff" }}>🎓</span>
@@ -470,14 +480,14 @@ function ProjCard({ p }) {
   );
 }
 
-function PageProjects() {
+function PageProjects({ isMobile }) {
   const [filter, setFilter] = useState("All");
   const cats = ["All", "Hardware", "Build", "Web", "Electronics"];
   const visible = filter === "All" ? PROJECTS : PROJECTS.filter(p => p.cat === filter);
 
   return (
-    <Page>
-      <div style={{ padding: "60px 48px 40px" }}>
+    <Page isMobile={isMobile}>
+      <div style={{ padding: isMobile ? "40px 18px 30px" : "60px 48px 40px" }}>
         <SecHeader title="Projects" sub="A selection of hardware, fabrication, and web projects built during my time at MIT and beyond." />
 
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", justifyContent: "center", marginBottom: 36 }}>
@@ -540,10 +550,10 @@ function ResearchCard({ research }) {
   );
 }
 
-function PageResearch() {
+function PageResearch({ isMobile }) {
   return (
-    <Page bg={T.altBg}>
-      <div style={{ padding: "60px 48px 40px" }}>
+    <Page bg={T.altBg} isMobile={isMobile}>
+      <div style={{ padding: isMobile ? "40px 18px 30px" : "60px 48px 40px" }}>
         <SecHeader title="Research" sub="My research is centered around digital fabrication and human-computer interaction — interfacing devices together and using maker skills to produce functional, innovative projects." />
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 24 }}>
@@ -572,7 +582,7 @@ function getReply(m) {
   return pickR(BOT_R.default);
 }
 
-function PageChat() {
+function PageChat({ isMobile }) {
   const [msgs, setMsgs] = useState([{ type: "bot", text: "Hi! I'm Ahmad's assistant. Ask me about his MIT education, research papers, hardware projects, or work experience!" }]);
   const [inp, setInp] = useState("");
   const [typingDot, setTypingDot] = useState(false);
@@ -591,11 +601,11 @@ function PageChat() {
   const SUGGS = ["What did you study at MIT?", "Tell me about your research", "What projects have you built?", "Are you available to hire?"];
 
   return (
-    <Page>
-      <div style={{ padding: "60px 48px 40px" }}>
+    <Page isMobile={isMobile}>
+      <div style={{ padding: isMobile ? "40px 18px 30px" : "60px 48px 40px" }}>
         <SecHeader title="Chat" sub="Have a question about Ahmad's background or projects? Ask the assistant below." />
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.4fr", gap: 40, alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1.4fr", gap: isMobile ? 24 : 40, alignItems: "start" }}>
           <div>
             <p style={{ color: T.text, fontSize: "0.88rem", lineHeight: 1.85, marginBottom: 20 }}>
               This demo assistant can answer common questions about Ahmad's degree, research, projects, and work history. Try the suggestion chips or type your own question.
@@ -670,13 +680,13 @@ function PageChat() {
   );
 }
 
-function PageContact() {
+function PageContact({ isMobile }) {
   return (
-    <Page bg={T.altBg}>
-      <div style={{ padding: "60px 48px 40px" }}>
+    <Page bg={T.altBg} isMobile={isMobile}>
+      <div style={{ padding: isMobile ? "40px 18px 30px" : "60px 48px 40px" }}>
         <SecHeader title="Contact" sub="Get in touch with Ahmad for collaboration, consulting, or just to say hello." />
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1.6fr", gap: 48 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1.6fr", gap: 48 }}>
           <div>
             <p style={{ color: T.text, fontSize: "0.88rem", lineHeight: 1.85, marginBottom: 28 }}>
               Whether you need a hardware engineer, an HCI researcher, or someone who can do both — Ahmad would love to connect.
@@ -726,25 +736,43 @@ function PageContact() {
 export default function App() {
   const [page, setPage] = useState("Home");
   const [navKey, setNavKey] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => { injectGlobal(); }, []);
 
-  const navigate = (p) => { setPage(p); setNavKey(k => k + 1); };
+  useEffect(() => {
+    const update = () => setIsMobile(window.innerWidth <= 900);
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const navigate = (p) => { setPage(p); setNavKey(k => k + 1); if (isMobile) setSidebarOpen(false); };
 
   const pages = {
-    Home:     <PageHome onNav={navigate} />,
-    About:    <PageAbout />,
-    Resume:   <PageResume />,
-    Projects: <PageProjects />,
-    Research: <PageResearch />,
-    Chat:     <PageChat />,
-    Contact:  <PageContact />,
+    Home:     <PageHome onNav={navigate} isMobile={isMobile} />,
+    About:    <PageAbout isMobile={isMobile} />,
+    Resume:   <PageResume isMobile={isMobile} />,
+    Projects: <PageProjects isMobile={isMobile} />,
+    Research: <PageResearch isMobile={isMobile} />,
+    Chat:     <PageChat isMobile={isMobile} />,
+    Contact:  <PageContact isMobile={isMobile} />,
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-      <Sidebar current={page} onNav={navigate} />
+    <div style={{ display: "flex", height: "100vh", overflow: "hidden", position: "relative" }}>
+      <Sidebar current={page} onNav={navigate} isMobile={isMobile} open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      {isMobile && sidebarOpen && (
+        <div onClick={() => setSidebarOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.35)", zIndex: 15 }} />
+      )}
       <div key={navKey} style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+        {isMobile && (
+          <div style={{ position: "sticky", top: 0, zIndex: 10, background: "#fff", borderBottom: "1px solid #eef1f5", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px" }}>
+            <div style={{ fontFamily: "'Raleway', sans-serif", fontWeight: 700, color: T.heading, fontSize: "0.95rem" }}>{page}</div>
+            <button onClick={() => setSidebarOpen(o => !o)} style={{ border: "none", background: "transparent", color: T.accent, fontSize: "1.05rem", cursor: "pointer" }}>☰ Menu</button>
+          </div>
+        )}
         {pages[page]}
       </div>
     </div>
